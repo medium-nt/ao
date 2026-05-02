@@ -6,6 +6,7 @@ use App\Enums\Role;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -48,5 +49,13 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => Role::class,
         ];
+    }
+
+    /**
+     * Получить клиентов, закреплённых за этим пользователем (менеджером).
+     */
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class, 'manager_id');
     }
 }

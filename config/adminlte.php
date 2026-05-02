@@ -320,6 +320,11 @@ return [
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
         [
+            'text' => 'Клиенты',
+            'url' => 'clients',
+            'icon' => 'fas fa-fw fa-briefcase',
+        ],
+        [
             'text' => 'Log Viewer',
             'url' => 'log',
             'icon' => 'fas fa-fw fa-bug',
