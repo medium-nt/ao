@@ -30,8 +30,8 @@
                             <td>{{ $service->title }}</td>
                             <td>{{ $service->description ?? '—' }}</td>
                             <td class="text-right">
-                                <a href="{{ route('services.edit', $service) }}" class="btn btn-sm btn-secondary">
-                                    <i class="fas fa-edit"></i> Редактировать
+                                <a href="{{ route('services.show', $service) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i> Просмотр
                                 </a>
                                 <form action="{{ route('services.destroy', $service) }}" method="POST" style="display: inline-block;"
                                       onsubmit="return confirm('Удалить услугу «{{ $service->title }}»?');">

@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
         <h1>Редактирование услуги</h1>
-        <a href="{{ route('services.index') }}" class="btn btn-default">
+        <a href="{{ route('services.show', $service) }}" class="btn btn-default">
             <i class="fas fa-arrow-left"></i> Назад
         </a>
     </div>

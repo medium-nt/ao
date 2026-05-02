@@ -24,6 +24,16 @@ class ServiceController extends Controller
     }
 
     /**
+     * Показать карточку услуги со статусами.
+     */
+    public function show(Service $service): Renderable
+    {
+        $service->load('statuses');
+
+        return view('services.show', compact('service'));
+    }
+
+    /**
      * Показать форму создания новой услуги.
      */
     public function create(): Renderable
@@ -56,7 +66,7 @@ class ServiceController extends Controller
     {
         $service->update($request->validated());
 
-        return redirect()->route('services.index')->with('status', 'Услуга успешно обновлена.');
+        return redirect()->route('services.show', $service)->with('status', 'Услуга успешно обновлена.');
     }
 
     /**

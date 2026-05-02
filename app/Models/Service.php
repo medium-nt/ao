@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -13,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $description Описание услуги
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property-read Collection<int, ServiceStatus> $statuses Статусы услуги
  */
 class Service extends Model
 {
@@ -25,4 +28,12 @@ class Service extends Model
         'title',
         'description',
     ];
+
+    /**
+     * Получить статусы услуги, отсортированные по порядку.
+     */
+    public function statuses(): HasMany
+    {
+        return $this->hasMany(ServiceStatus::class)->orderBy('sort_order');
+    }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientDocumentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ServiceStatusController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,4 +41,10 @@ Route::middleware('auth')->can('is-admin')->group(function () {
     Route::post('/documents/{document}/approve', [ClientDocumentController::class, 'approve'])->name('client-documents.approve');
 
     Route::resource('services', ServiceController::class)->except(['show']);
+
+    Route::get('/services/{service}', [ServiceController::class, 'show'])->name('services.show');
+    Route::post('/services/{service}/statuses', [ServiceStatusController::class, 'store'])->name('service-statuses.store');
+    Route::put('/services/{service}/statuses/{status}', [ServiceStatusController::class, 'update'])->name('service-statuses.update');
+    Route::delete('/services/{service}/statuses/{status}', [ServiceStatusController::class, 'destroy'])->name('service-statuses.destroy');
+    Route::post('/services/{service}/statuses/reorder', [ServiceStatusController::class, 'reorder'])->name('service-statuses.reorder');
 });
