@@ -58,4 +58,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(Client::class, 'manager_id');
     }
+
+    /**
+     * Проверить, является ли пользователь администратором.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::Admin;
+    }
+
+    /**
+     * Проверить, является ли пользователь менеджером.
+     */
+    public function isManager(): bool
+    {
+        return $this->role === Role::Manager;
+    }
 }

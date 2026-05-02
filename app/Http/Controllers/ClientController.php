@@ -16,10 +16,17 @@ class ClientController extends Controller
 {
     /**
      * Отобразить список клиентов.
+     * Админ видит всех, менеджер — только своих.
      */
     public function index(): Renderable
     {
-        $clients = Client::with('manager')->orderBy('id')->paginate(15);
+        $query = Client::with('manager')->orderBy('id');
+
+        if (! auth()->user()->isAdmin()) {
+            $query->where('manager_id', auth()->id());
+        }
+
+        $clients = $query->paginate(15);
 
         return view('clients.index', compact('clients'));
     }
@@ -36,10 +43,17 @@ class ClientController extends Controller
 
     /**
      * Сохранить нового клиента в базу данных.
+     * Менеджеру автоматически проставляется его ID.
      */
     public function store(ClientRequest $request): RedirectResponse
     {
-        Client::create($request->validated());
+        $data = $request->validated();
+
+        if (! auth()->user()->isAdmin()) {
+            $data['manager_id'] = auth()->id();
+        }
+
+        Client::create($data);
 
         return redirect()->route('clients.index')->with('status', 'Клиент успешно создан.');
     }
@@ -49,6 +63,7 @@ class ClientController extends Controller
      */
     public function show(Client $client): Renderable
     {
+        $this->authorizeAccess($client);
         $client->load('manager');
 
         return view('clients.show', compact('client'));
@@ -59,6 +74,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client): Renderable
     {
+        $this->authorizeAccess($client);
         $managers = User::where('role', Role::Manager)->orderBy('name')->get();
 
         return view('clients.edit', compact('client', 'managers'));
@@ -69,7 +85,14 @@ class ClientController extends Controller
      */
     public function update(ClientRequest $request, Client $client): RedirectResponse
     {
-        $client->update($request->validated());
+        $this->authorizeAccess($client);
+        $data = $request->validated();
+
+        if (! auth()->user()->isAdmin()) {
+            $data['manager_id'] = auth()->id();
+        }
+
+        $client->update($data);
 
         return redirect()->route('clients.index')->with('status', 'Клиент успешно обновлён.');
     }
@@ -79,8 +102,19 @@ class ClientController extends Controller
      */
     public function destroy(Client $client): RedirectResponse
     {
+        $this->authorizeAccess($client);
         $client->delete();
 
         return redirect()->route('clients.index')->with('status', 'Клиент успешно удалён.');
+    }
+
+    /**
+     * Проверить доступ: менеджер может работать только со своими клиентами.
+     */
+    private function authorizeAccess(Client $client): void
+    {
+        if (! auth()->user()->isAdmin() && $client->manager_id !== auth()->id()) {
+            abort(403);
+        }
     }
 }

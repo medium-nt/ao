@@ -37,6 +37,7 @@
                     @enderror
                 </div>
 
+                @if (auth()->user()->isAdmin())
                 <div class="form-group">
                     <label for="manager_id">Менеджер</label>
                     <select name="manager_id" id="manager_id"
@@ -52,6 +53,7 @@
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
+                @endif
 
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Создать
