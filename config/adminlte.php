@@ -340,6 +340,11 @@ return [
                     'url' => 'users',
                     'icon' => 'fas fa-fw fa-users',
                 ],
+                [
+                    'text' => 'Услуги',
+                    'url' => 'services',
+                    'icon' => 'fas fa-fw fa-concierge-bell',
+                ],
             ],
         ],
     ],
