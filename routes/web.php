@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientDocumentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [ClientController::class, 'update'])->name('clients.update');
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+
+    Route::post('/clients/{client}/documents', [ClientDocumentController::class, 'store'])->name('client-documents.store');
+    Route::get('/documents/{document}/download', [ClientDocumentController::class, 'download'])->name('client-documents.download');
+    Route::delete('/documents/{document}', [ClientDocumentController::class, 'destroy'])->name('client-documents.destroy');
 });
 
 Route::middleware('auth')->can('is-admin')->group(function () {
@@ -30,4 +35,6 @@ Route::middleware('auth')->can('is-admin')->group(function () {
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    Route::post('/documents/{document}/approve', [ClientDocumentController::class, 'approve'])->name('client-documents.approve');
 });

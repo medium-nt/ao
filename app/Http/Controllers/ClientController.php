@@ -64,7 +64,7 @@ class ClientController extends Controller
     public function show(Client $client): Renderable
     {
         $this->authorizeAccess($client);
-        $client->load('manager');
+        $client->load('manager', 'documents');
 
         return view('clients.show', compact('client'));
     }

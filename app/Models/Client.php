@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * Модель клиента.
@@ -12,9 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $company_name Название компании
  * @property string $name ФИО контактного лица
  * @property int|null $manager_id ID менеджера, ведущего клиента
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \App\Models\User|null $manager Менеджер, закреплённый за клиентом
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property-read User|null $manager Менеджер, закреплённый за клиентом
  */
 class Client extends Model
 {
@@ -35,5 +37,13 @@ class Client extends Model
     public function manager(): BelongsTo
     {
         return $this->belongsTo(User::class, 'manager_id');
+    }
+
+    /**
+     * Получить документы клиента.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ClientDocument::class);
     }
 }
