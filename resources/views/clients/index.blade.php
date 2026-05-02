@@ -35,9 +35,6 @@
                                 <a href="{{ route('clients.show', $client) }}" class="btn btn-sm btn-secondary">
                                     <i class="fas fa-eye"></i> Просмотр
                                 </a>
-                                <a href="{{ route('clients.edit', $client) }}" class="btn btn-sm btn-info">
-                                    <i class="fas fa-pen"></i> Редактировать
-                                </a>
                                 <form action="{{ route('clients.destroy', $client) }}" method="POST" style="display: inline-block;"
                                       onsubmit="return confirm('Удалить клиента {{ $client->company_name }}?');">
                                     @csrf

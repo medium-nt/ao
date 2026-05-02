@@ -94,7 +94,7 @@ class ClientController extends Controller
 
         $client->update($data);
 
-        return redirect()->route('clients.index')->with('status', 'Клиент успешно обновлён.');
+        return redirect()->route('clients.show', $client)->with('status', 'Клиент успешно обновлён.');
     }
 
     /**
