@@ -143,31 +143,17 @@
                             <th>Дата завершения</th>
                             <th>Стоимость</th>
                             <th>Примечание</th>
-                            <th class="text-right">Действия</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($client->orders as $order)
                             <tr>
-                                <td>{{ $order->service->title }}</td>
+                                <td><a href="{{ route('orders.show', [$client, $order]) }}">{{ $order->service->title }}</a></td>
                                 <td>{{ $order->status?->title ?? '—' }}</td>
                                 <td>{{ $order->start_date->format('d.m.Y') }}</td>
                                 <td>{{ $order->end_date?->format('d.m.Y') ?? '—' }}</td>
                                 <td>{{ number_format($order->price, 2, ',', ' ') }}</td>
                                 <td>{{ $order->note ?? '—' }}</td>
-                                <td class="text-right">
-                                    <a href="{{ route('orders.edit', [$client, $order]) }}" class="btn btn-sm btn-secondary" title="Редактировать">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('orders.destroy', [$client, $order]) }}" method="POST" style="display: inline-block;"
-                                          onsubmit="return confirm('Удалить заказ «{{ $order->service->title }}»?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>

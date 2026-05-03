@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\OrderStatusRequest;
 use App\Models\Client;
 use App\Models\Order;
+use App\Models\OrderHistory;
 use App\Models\Service;
 use App\Models\ServiceStatus;
 use Illuminate\Contracts\Support\Renderable;
@@ -15,6 +17,21 @@ use Illuminate\Http\RedirectResponse;
  */
 class OrderController extends Controller
 {
+    /**
+     * Показать карточку заказа.
+     */
+    public function show(Client $client, Order $order): Renderable
+    {
+        $this->authorizeClientAccess($client);
+        $order->load('service.statuses', 'status', 'histories');
+
+        $statuses = $order->service->statuses;
+        $currentIndex = $statuses->search(fn ($s) => $s->id === $order->status_id);
+        $nextStatus = $statuses->get($currentIndex + 1);
+
+        return view('orders.show', compact('client', 'order', 'nextStatus'));
+    }
+
     /**
      * Показать форму создания нового заказа.
      */
@@ -55,9 +72,8 @@ class OrderController extends Controller
     public function edit(Client $client, Order $order): Renderable
     {
         $this->authorizeClientAccess($client);
-        $services = Service::with('statuses')->orderBy('title')->get();
 
-        return view('orders.edit', compact('client', 'order', 'services'));
+        return view('orders.edit', compact('client', 'order'));
     }
 
     /**
@@ -68,7 +84,36 @@ class OrderController extends Controller
         $this->authorizeClientAccess($client);
         $order->update($request->validated());
 
-        return redirect()->route('clients.show', $client)->with('status', 'Заказ успешно обновлён.');
+        return redirect()->route('orders.show', [$client, $order])->with('status', 'Заказ успешно обновлён.');
+    }
+
+    /**
+     * Перенести заказ на следующий статус в pipeline.
+     * Сохраняет snapshot текущего статуса в историю.
+     */
+    public function changeStatus(OrderStatusRequest $request, Client $client, Order $order): RedirectResponse
+    {
+        $this->authorizeClientAccess($client);
+
+        $statuses = $order->service->statuses;
+        $currentIndex = $statuses->search(fn ($s) => $s->id === $order->status_id);
+        $nextStatus = $statuses->get($currentIndex + 1);
+
+        if (! $nextStatus) {
+            return redirect()->route('orders.show', [$client, $order])
+                ->with('error', 'Заказ уже на последнем статусе.');
+        }
+
+        OrderHistory::create([
+            'order_id' => $order->id,
+            'status_title' => $order->status?->title ?? '—',
+            'note' => $request->validated('note'),
+        ]);
+
+        $order->update(['status_id' => $nextStatus->id]);
+
+        return redirect()->route('orders.show', [$client, $order])
+            ->with('status', 'Статус успешно изменён.');
     }
 
     /**

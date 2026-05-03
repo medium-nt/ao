@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -22,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property-read Client $client
  * @property-read Service $service
  * @property-read ServiceStatus|null $status
+ * @property-read Collection<int, OrderHistory> $histories
  */
 class Order extends Model
 {
@@ -71,5 +74,13 @@ class Order extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(ServiceStatus::class, 'status_id');
+    }
+
+    /**
+     * Получить историю смены статусов заказа.
+     */
+    public function histories(): HasMany
+    {
+        return $this->hasMany(OrderHistory::class)->orderBy('created_at');
     }
 }

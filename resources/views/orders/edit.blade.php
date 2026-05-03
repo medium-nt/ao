@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
         <h1>Редактирование заказа — {{ $client->company_name }}</h1>
-        <a href="{{ route('clients.show', $client) }}" class="btn btn-default">
+        <a href="{{ route('orders.show', [$client, $order]) }}" class="btn btn-default">
             <i class="fas fa-arrow-left"></i> Назад
         </a>
     </div>
@@ -24,15 +24,9 @@
                     <input type="hidden" name="service_id" value="{{ $order->service_id }}">
                 </div>
 
-                <div class="form-group" id="status-group">
-                    <label for="status_id">Статус</label>
-                    <select name="status_id" id="status_id"
-                            class="form-control @error('status_id') is-invalid @enderror">
-                        <option value="">—</option>
-                    </select>
-                    @error('status_id')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
+                <div class="form-group">
+                    <label>Текущий статус</label>
+                    <input type="text" class="form-control" value="{{ $order->status?->title ?? '—' }}" disabled>
                 </div>
 
                 <div class="row">
@@ -84,24 +78,3 @@
     </div>
 @stop
 
-@push('js')
-    <script>
-        const serviceStatuses = @json($services->mapWithKeys(fn($s) => [$s->id => $s->statuses]));
-        const currentStatusId = {{ $order->status_id ?? 'null' }};
-        const currentServiceId = {{ $order->service_id }};
-        const statuses = serviceStatuses[currentServiceId] || [];
-        const statusSelect = document.getElementById('status_id');
-        const statusGroup = document.getElementById('status-group');
-
-        statusSelect.innerHTML = '<option value="">—</option>';
-        statuses.forEach(function (status) {
-            const opt = document.createElement('option');
-            opt.value = status.id;
-            opt.textContent = status.title;
-            if (status.id == currentStatusId) opt.selected = true;
-            statusSelect.appendChild(opt);
-        });
-
-        statusGroup.style.display = statuses.length > 0 ? 'block' : 'none';
-    </script>
-@endpush
