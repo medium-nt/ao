@@ -13,7 +13,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-8">
             <div class="card">
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -41,8 +41,45 @@
                     </a>
                 </div>
             </div>
+
+            <div class="card mt-3">
+                <div class="card-header clearfix">
+                    <h3 class="card-title d-inline">Заказы</h3>
+                    <a href="{{ route('orders.create', $client) }}" class="btn btn-sm btn-primary float-right">
+                        <i class="fas fa-plus"></i> Добавить заказ
+                    </a>
+                </div>
+                <div class="card-body table-responsive p-0">
+                    @if ($client->orders->isNotEmpty())
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Услуга</th>
+                                    <th>Статус</th>
+                                    <th>Даты</th>
+                                    <th>Стоимость</th>
+                                    <th>Примечание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($client->orders as $order)
+                                    <tr>
+                                        <td><a href="{{ route('orders.show', [$client, $order]) }}">{{ $order->service->title }}</a></td>
+                                        <td>{{ $order->status?->title ?? '—' }}</td>
+                                        <td>{{ $order->start_date->format('d.m.Y') }}{{ $order->end_date ? ' — ' . $order->end_date->format('d.m.Y') : '' }}</td>
+                                        <td>{{ number_format($order->price, 2, ',', ' ') }}</td>
+                                        <td>{{ $order->note ?? '—' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    @else
+                        <p class="text-muted text-center py-3 mb-0">Заказы не добавлены.</p>
+                    @endif
+                </div>
+            </div>
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-4">
             @foreach (\App\Enums\DocumentType::cases() as $docType)
                 @php
                     $typeDocs = $client->documents->where('type', $docType);
@@ -51,116 +88,63 @@
                     <div class="card-header">
                         <h3 class="card-title mb-0">{{ $docType->label() }} <span class="badge badge-secondary">{{ $typeDocs->count() }}</span></h3>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         @if ($typeDocs->isNotEmpty())
-                            <table class="table table-sm table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Файл</th>
-                                        <th>Дата загрузки</th>
-                                        <th>Статус</th>
-                                        <th class="text-right">Действия</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($typeDocs as $doc)
-                                        <tr>
-                                            <td>{{ $doc->original_name }}</td>
-                                            <td>{{ $doc->created_at->format('d.m.Y H:i') }}</td>
-                                            <td>
-                                                @if ($doc->is_approved)
-                                                    <span class="badge badge-success">Одобрен</span>
-                                                @else
-                                                    <span class="badge badge-warning">Не одобрен</span>
-                                                @endif
-                                            </td>
-                                            <td class="text-right">
-                                                <a href="{{ route('client-documents.download', $doc) }}" class="btn btn-sm btn-secondary">
-                                                    <i class="fas fa-download"></i>
-                                                </a>
-                                                @if (! $doc->is_approved && auth()->user()->isAdmin())
-                                                    <form action="{{ route('client-documents.approve', $doc) }}" method="POST" style="display: inline-block;">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn-success" title="Одобрить">
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
-                                                <form action="{{ route('client-documents.destroy', $doc) }}" method="POST" style="display: inline-block;"
-                                                      onsubmit="return confirm('Удалить документ {{ $doc->original_name }}?');">
+                            <ul class="list-group list-group-flush">
+                                @foreach ($typeDocs as $doc)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                                        <div class="text-truncate mr-2" style="max-width: 60%;">
+                                            <span class="d-block text-truncate">{{ $doc->original_name }}</span>
+                                            <small class="text-muted">{{ $doc->created_at->format('d.m.Y') }}</small>
+                                            @if ($doc->is_approved)
+                                                <span class="badge badge-success">Одобрен</span>
+                                            @else
+                                                <span class="badge badge-warning">Не одобрен</span>
+                                            @endif
+                                        </div>
+                                        <div class="d-flex align-items-center text-nowrap">
+                                            <a href="{{ route('client-documents.download', $doc) }}" class="btn btn-sm btn-secondary mr-1" title="Скачать">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            @if (! $doc->is_approved && auth()->user()->isAdmin())
+                                                <form action="{{ route('client-documents.approve', $doc) }}" method="POST" style="display: inline-block;">
                                                     @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
-                                                        <i class="fas fa-trash"></i>
+                                                    <button type="submit" class="btn btn-sm btn-success mr-1" title="Одобрить">
+                                                        <i class="fas fa-check"></i>
                                                     </button>
                                                 </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                            @endif
+                                            <form action="{{ route('client-documents.destroy', $doc) }}" method="POST" style="display: inline-block;"
+                                                  onsubmit="return confirm('Удалить документ {{ $doc->original_name }}?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
                         @else
-                            <p class="text-muted mb-0">Документы не загружены.</p>
+                            <p class="text-muted mb-0 px-3 py-2">Документы не загружены.</p>
                         @endif
-
-                        <hr>
+                    </div>
+                    <div class="card-footer">
                         <form action="{{ route('client-documents.store', $client) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="type" value="{{ $docType->value }}">
-                            <div class="form-inline">
-                                <div class="input-group mr-2" style="flex: 1;">
-                                    <div class="custom-file">
-                                        <input type="file" name="file" id="file_{{ $docType->value }}" class="custom-file-input" required>
-                                        <label class="custom-file-label" for="file_{{ $docType->value }}" data-browse="Выбрать">Выберите файл...</label>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-upload"></i> Загрузить
-                                </button>
+                            <div class="custom-file mb-2">
+                                <input type="file" name="file" id="file_{{ $docType->value }}" class="custom-file-input" required>
+                                <label class="custom-file-label" for="file_{{ $docType->value }}" data-browse="Выбрать">Выберите файл...</label>
                             </div>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-upload"></i> Загрузить
+                            </button>
                         </form>
                     </div>
                 </div>
             @endforeach
-        </div>
-    </div>
-
-    <div class="card mt-3">
-        <div class="card-header clearfix">
-            <h3 class="card-title d-inline">Заказы</h3>
-            <a href="{{ route('orders.create', $client) }}" class="btn btn-sm btn-primary float-right">
-                <i class="fas fa-plus"></i> Добавить заказ
-            </a>
-        </div>
-        <div class="card-body table-responsive p-0">
-            @if ($client->orders->isNotEmpty())
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Услуга</th>
-                            <th>Статус</th>
-                            <th>Дата начала</th>
-                            <th>Дата завершения</th>
-                            <th>Стоимость</th>
-                            <th>Примечание</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($client->orders as $order)
-                            <tr>
-                                <td><a href="{{ route('orders.show', [$client, $order]) }}">{{ $order->service->title }}</a></td>
-                                <td>{{ $order->status?->title ?? '—' }}</td>
-                                <td>{{ $order->start_date->format('d.m.Y') }}</td>
-                                <td>{{ $order->end_date?->format('d.m.Y') ?? '—' }}</td>
-                                <td>{{ number_format($order->price, 2, ',', ' ') }}</td>
-                                <td>{{ $order->note ?? '—' }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @else
-                <p class="text-muted text-center py-3 mb-0">Заказы не добавлены.</p>
-            @endif
         </div>
     </div>
 @stop
