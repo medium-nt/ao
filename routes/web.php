@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientDocumentController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceStatusController;
 use App\Http\Controllers\UserController;
@@ -28,6 +29,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/clients/{client}/documents', [ClientDocumentController::class, 'store'])->name('client-documents.store');
     Route::get('/documents/{document}/download', [ClientDocumentController::class, 'download'])->name('client-documents.download');
     Route::delete('/documents/{document}', [ClientDocumentController::class, 'destroy'])->name('client-documents.destroy');
+
+    Route::get('/clients/{client}/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/clients/{client}/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/clients/{client}/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+    Route::put('/clients/{client}/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/clients/{client}/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 });
 
 Route::middleware('auth')->can('is-admin')->group(function () {

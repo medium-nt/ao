@@ -124,6 +124,59 @@
             @endforeach
         </div>
     </div>
+
+    <div class="card mt-3">
+        <div class="card-header clearfix">
+            <h3 class="card-title d-inline">Заказы</h3>
+            <a href="{{ route('orders.create', $client) }}" class="btn btn-sm btn-primary float-right">
+                <i class="fas fa-plus"></i> Добавить заказ
+            </a>
+        </div>
+        <div class="card-body table-responsive p-0">
+            @if ($client->orders->isNotEmpty())
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Услуга</th>
+                            <th>Статус</th>
+                            <th>Дата начала</th>
+                            <th>Дата завершения</th>
+                            <th>Стоимость</th>
+                            <th>Примечание</th>
+                            <th class="text-right">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($client->orders as $order)
+                            <tr>
+                                <td>{{ $order->service->title }}</td>
+                                <td>{{ $order->status?->title ?? '—' }}</td>
+                                <td>{{ $order->start_date->format('d.m.Y') }}</td>
+                                <td>{{ $order->end_date?->format('d.m.Y') ?? '—' }}</td>
+                                <td>{{ number_format($order->price, 2, ',', ' ') }}</td>
+                                <td>{{ $order->note ?? '—' }}</td>
+                                <td class="text-right">
+                                    <a href="{{ route('orders.edit', [$client, $order]) }}" class="btn btn-sm btn-secondary" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('orders.destroy', [$client, $order]) }}" method="POST" style="display: inline-block;"
+                                          onsubmit="return confirm('Удалить заказ «{{ $order->service->title }}»?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Удалить">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p class="text-muted text-center py-3 mb-0">Заказы не добавлены.</p>
+            @endif
+        </div>
+    </div>
 @stop
 
 @push('js')

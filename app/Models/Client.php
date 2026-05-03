@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read User|null $manager Менеджер, закреплённый за клиентом
+ * @property-read Collection<int, Order> $orders Заказы клиента
  */
 class Client extends Model
 {
@@ -45,5 +47,13 @@ class Client extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ClientDocument::class);
+    }
+
+    /**
+     * Получить заказы клиента.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 }

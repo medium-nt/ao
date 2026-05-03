@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read Collection<int, ServiceStatus> $statuses Статусы услуги
+ * @property-read Collection<int, Order> $orders Заказы на эту услугу
  */
 class Service extends Model
 {
@@ -35,5 +36,13 @@ class Service extends Model
     public function statuses(): HasMany
     {
         return $this->hasMany(ServiceStatus::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Получить заказы на эту услугу.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 }
