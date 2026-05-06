@@ -15,6 +15,7 @@
                     <div class="form-group mr-2 mb-2">
                         <label class="mr-1">Год</label>
                         <select name="year" class="form-control form-control-sm">
+                            <option value="" {{ !$filters['year'] ? 'selected' : '' }}>Все</option>
                             @foreach ($years as $year)
                                 <option value="{{ $year }}" {{ $filters['year'] == $year ? 'selected' : '' }}>{{ $year }}</option>
                             @endforeach

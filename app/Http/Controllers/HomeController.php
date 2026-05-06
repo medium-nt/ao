@@ -30,13 +30,13 @@ class HomeController extends Controller
 
         $filters = [
             'year' => $request->input('year', now()->year),
-            'month' => $request->input('month', ''),
+            'month' => $request->input('month', now()->month),
             'service_id' => $request->input('service_id', ''),
             'manager_id' => $request->input('manager_id', ''),
         ];
 
         $orders = Order::with(['client.manager', 'service.statuses', 'status', 'transactions'])
-            ->whereRaw("strftime('%Y', start_date) = ?", [(string) $filters['year']])
+            ->when($filters['year'], fn ($q) => $q->whereRaw("strftime('%Y', start_date) = ?", [(string) $filters['year']]))
             ->when($filters['month'], fn ($q) => $q->whereRaw("strftime('%m', start_date) = ?", [str_pad($filters['month'], 2, '0', STR_PAD_LEFT)]))
             ->when($filters['service_id'], fn ($q) => $q->where('service_id', $filters['service_id']))
             ->when($filters['manager_id'], fn ($q) => $q->whereHas('client', fn ($q) => $q->where('manager_id', $filters['manager_id'])))
