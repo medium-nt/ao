@@ -33,14 +33,16 @@
                                 <a href="{{ route('services.show', $service) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i> Просмотр
                                 </a>
-                                <form action="{{ route('services.destroy', $service) }}" method="POST" style="display: inline-block;"
-                                      onsubmit="return confirm('Удалить услугу «{{ $service->title }}»?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="fas fa-trash"></i> Удалить
-                                    </button>
-                                </form>
+                                @if ($service->orders_count === 0)
+                                    <form action="{{ route('services.destroy', $service) }}" method="POST" style="display: inline-block;"
+                                          onsubmit="return confirm('Удалить услугу «{{ $service->title }}»?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Удалить
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

@@ -18,7 +18,7 @@ class ServiceController extends Controller
      */
     public function index(): Renderable
     {
-        $services = Service::orderBy('id')->paginate(15);
+        $services = Service::withCount('orders')->orderBy('id')->paginate(15);
 
         return view('services.index', compact('services'));
     }
@@ -74,8 +74,14 @@ class ServiceController extends Controller
      */
     public function destroy(Service $service): RedirectResponse
     {
+        if ($service->orders()->exists()) {
+            return redirect()->route('services.index')
+                ->with('error', 'Нельзя удалить услугу, у которой есть заказы.');
+        }
+
         $service->delete();
 
-        return redirect()->route('services.index')->with('status', 'Услуга успешно удалена.');
+        return redirect()->route('services.index')
+            ->with('status', 'Услуга успешно удалена.');
     }
 }
