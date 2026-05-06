@@ -33,17 +33,6 @@
                     @enderror
                 </div>
 
-                <div class="form-group" id="status-group" style="display: none;">
-                    <label for="status_id">Статус</label>
-                    <select name="status_id" id="status_id"
-                            class="form-control @error('status_id') is-invalid @enderror">
-                        <option value="">—</option>
-                    </select>
-                    @error('status_id')
-                        <span class="invalid-feedback">{{ $message }}</span>
-                    @enderror
-                </div>
-
                 <div class="form-group">
                     <label for="start_date">Дата начала</label>
                     <input type="date" name="start_date" id="start_date"
@@ -81,26 +70,3 @@
         </div>
     </div>
 @stop
-
-@push('js')
-    <script>
-        const serviceStatuses = @json($services->mapWithKeys(fn($s) => [$s->id => $s->statuses]));
-
-        document.getElementById('service_id').addEventListener('change', function () {
-            const serviceId = this.value;
-            const statusSelect = document.getElementById('status_id');
-            const statusGroup = document.getElementById('status-group');
-            const statuses = serviceStatuses[serviceId] || [];
-
-            statusSelect.innerHTML = '<option value="">—</option>';
-            statuses.forEach(function (status) {
-                const opt = document.createElement('option');
-                opt.value = status.id;
-                opt.textContent = status.title;
-                statusSelect.appendChild(opt);
-            });
-
-            statusGroup.style.display = statuses.length > 0 ? 'block' : 'none';
-        });
-    </script>
-@endpush
