@@ -16,14 +16,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        User::create([
             'name' => 'Администратор',
             'email' => '1@1.ru',
             'password' => '111111',
             'role' => Role::Admin,
         ]);
 
-        User::factory()->create([
+        User::create([
             'name' => 'Менеджер',
             'email' => '2@2.ru',
             'password' => '222222',
