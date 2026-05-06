@@ -23,10 +23,12 @@ class HomeController extends Controller
         $managers = User::where('role', Role::Manager)->orderBy('name')->get();
         $allServices = Service::with('statuses')->orderBy('title')->get();
 
-        $years = Order::query()
-            ->selectRaw("DISTINCT CAST(strftime('%Y', start_date) AS INTEGER) as year")
-            ->orderByDesc('year')
-            ->pluck('year');
+        $years = Order::pluck('start_date')
+            ->map(fn ($date) => $date?->year)
+            ->filter()
+            ->unique()
+            ->sortDesc()
+            ->values();
 
         $filters = [
             'year' => $request->input('year', now()->year),
@@ -36,8 +38,8 @@ class HomeController extends Controller
         ];
 
         $orders = Order::with(['client.manager', 'service.statuses', 'status', 'transactions'])
-            ->when($filters['year'], fn ($q) => $q->whereRaw("strftime('%Y', start_date) = ?", [(string) $filters['year']]))
-            ->when($filters['month'], fn ($q) => $q->whereRaw("strftime('%m', start_date) = ?", [str_pad($filters['month'], 2, '0', STR_PAD_LEFT)]))
+            ->when($filters['year'], fn ($q) => $q->whereYear('start_date', $filters['year']))
+            ->when($filters['month'], fn ($q) => $q->whereMonth('start_date', $filters['month']))
             ->when($filters['service_id'], fn ($q) => $q->where('service_id', $filters['service_id']))
             ->when($filters['manager_id'], fn ($q) => $q->whereHas('client', fn ($q) => $q->where('manager_id', $filters['manager_id'])))
             ->orderBy('start_date')
