@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceStatusController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/clients/{client}/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::delete('/clients/{client}/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('/clients/{client}/orders/{order}/change-status', [OrderController::class, 'changeStatus'])->name('orders.change-status');
+
+    Route::post('/clients/{client}/orders/{order}/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::delete('/clients/{client}/orders/{order}/transactions/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
 });
 
 Route::middleware('auth')->can('is-admin')->group(function () {

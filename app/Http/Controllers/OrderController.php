@@ -23,7 +23,7 @@ class OrderController extends Controller
     public function show(Client $client, Order $order): Renderable
     {
         $this->authorizeClientAccess($client);
-        $order->load('service.statuses', 'status', 'histories');
+        $order->load('service.statuses', 'status', 'histories', 'transactions');
 
         $statuses = $order->service->statuses;
         $currentIndex = $statuses->search(fn ($s) => $s->id === $order->status_id);

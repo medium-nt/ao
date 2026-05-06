@@ -25,6 +25,7 @@ use Illuminate\Support\Carbon;
  * @property-read Service $service
  * @property-read ServiceStatus|null $status
  * @property-read Collection<int, OrderHistory> $histories
+ * @property-read Collection<int, Transaction> $transactions
  */
 class Order extends Model
 {
@@ -82,5 +83,13 @@ class Order extends Model
     public function histories(): HasMany
     {
         return $this->hasMany(OrderHistory::class)->orderBy('created_at');
+    }
+
+    /**
+     * Получить финансовые транзакции заказа.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class)->orderBy('created_at');
     }
 }
