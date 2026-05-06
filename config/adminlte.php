@@ -325,12 +325,6 @@ return [
             'icon' => 'fas fa-fw fa-briefcase',
         ],
         [
-            'text' => 'Log Viewer',
-            'url' => 'log',
-            'icon' => 'fas fa-fw fa-bug',
-            'target' => '_blank',
-        ],
-        [
             'text' => 'Настройки',
             'icon' => 'fas fa-fw fa-cogs',
             'can' => 'is-admin',
@@ -346,6 +340,13 @@ return [
                     'icon' => 'fas fa-fw fa-concierge-bell',
                 ],
             ],
+        ],
+        [
+            'text' => 'Логи',
+            'url' => 'log',
+            'icon' => 'fas fa-fw fa-bug',
+            'can' => 'is-admin',
+            'target' => '_blank',
         ],
     ],
 
